@@ -11,3 +11,11 @@ export async function login(req: Request, res: Response): Promise<void> {
 
   res.status(200).json(result)
 }
+
+export async function logout(req: Request, res: Response): Promise<void> {
+  const accessToken = req.headers.authorization?.replace('Bearer ', '')
+
+  await AuthService.logout(accessToken)
+
+  res.status(204).send()
+}

@@ -20,6 +20,19 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  tokens Token[]
 
   @@map("users")
+}
+
+model Token {
+  id        Int      @id @default(autoincrement())
+  uuid      String   @unique @default(uuid())
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @map(name: "user_id")
+  jti       String   @unique @default(uuid())
+  aud       String?
+
+  @@map(name: "tokens")
 }

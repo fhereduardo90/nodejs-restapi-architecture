@@ -37,8 +37,9 @@ export class UsersService {
         password: hashSync(password, 10),
       },
     })
+    const token = await AuthService.createToken(user.id)
 
-    return AuthService.generateAccessToken(user.uuid)
+    return AuthService.generateAccessToken(token.jti)
   }
 
   static async findOne(uuid: string): Promise<UserDto> {

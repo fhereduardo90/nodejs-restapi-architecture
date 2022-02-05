@@ -10,18 +10,21 @@ passport.use(
       secretOrKey: process.env.JWT_SECRET_KEY as string,
     },
     async (jwtPayload, done) => {
-      const user = await prisma.user.findUnique({
+      const token = await prisma.token.findUnique({
         where: {
-          uuid: jwtPayload.sub,
+          jti: jwtPayload.sub,
+        },
+        select: {
+          user: { select: { uuid: true } },
         },
         rejectOnNotFound: false,
       })
 
-      if (!user) {
+      if (!token) {
         return done(new Unauthorized('Invalid credentials'), null)
       }
 
-      return done(null, { uuid: user.uuid })
+      return done(null, { uuid: token.user.uuid })
     },
   ),
 )
