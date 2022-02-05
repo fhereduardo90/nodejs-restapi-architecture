@@ -14,22 +14,22 @@ export class UpdateUserDto extends BaseDto {
   @IsNotEmpty()
   @IsString()
   @IsOptional()
-  readonly firstName: string
+  readonly firstName?: string
 
   @Expose()
   @IsNotEmpty()
   @IsString()
   @IsOptional()
-  readonly lastName: string
+  readonly lastName?: string
 
   @Expose()
   @IsEmail()
   @IsOptional()
-  readonly email: string
+  readonly email?: string
 
   @Expose()
   @IsString()
   @Length(6, 20)
   @IsOptional()
-  readonly password: string
+  readonly password?: string
 }
