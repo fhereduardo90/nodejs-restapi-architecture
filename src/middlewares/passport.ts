@@ -1,7 +1,7 @@
 import { Unauthorized } from 'http-errors'
 import passport from 'passport'
 import { ExtractJwt, Strategy } from 'passport-jwt'
-import { prisma } from '../server'
+import { prisma } from '../prisma'
 
 passport.use(
   new Strategy(
