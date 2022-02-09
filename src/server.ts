@@ -1,22 +1,14 @@
 import 'reflect-metadata'
-import dotenv from 'dotenv'
-
-dotenv.config()
-
 import express, { NextFunction, Request, Response } from 'express'
 import cors, { CorsOptions } from 'cors'
-import createHttpError, { HttpError } from 'http-errors'
+import { HttpError } from 'http-errors'
 import './middlewares/passport'
-import { PrismaClient } from '@prisma/client'
 import passport from 'passport'
 import { plainToClass } from 'class-transformer'
 import { router } from './router'
 import { HttpErrorDto } from './dtos/http-error.dto'
 import { initEvents } from './events'
 
-export const prisma = new PrismaClient({
-  rejectOnNotFound: (error) => new createHttpError.NotFound(error.message),
-})
 const app = express()
 const PORT = process.env.PORT || 3000
 const ENVIROMENT = process.env.NODE_ENV || 'development'
