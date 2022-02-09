@@ -1,11 +1,10 @@
 import { Prisma, Token } from '@prisma/client'
 import { compareSync } from 'bcryptjs'
 import { Unauthorized, NotFound } from 'http-errors'
-import jwt from 'jsonwebtoken'
+import { verify, sign } from 'jsonwebtoken'
 import { LoginDto } from '../dtos/auths/request/login.dto'
 import { TokenDto } from '../dtos/auths/response/token.dto'
-
-import { prisma } from '../server'
+import { prisma } from '../prisma'
 import { PrismaErrorEnum } from '../utils/enums'
 
 export class AuthService {
@@ -42,7 +41,7 @@ export class AuthService {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         switch (error.code) {
-          case PrismaErrorEnum.NOT_FOUND:
+          case PrismaErrorEnum.FOREIGN_KEY_CONSTRAINT:
             throw new NotFound('User not found')
           default:
             throw error
@@ -57,10 +56,7 @@ export class AuthService {
     if (!accessToken) return
 
     try {
-      const { sub } = jwt.verify(
-        accessToken,
-        process.env.JWT_SECRET_KEY as string,
-      )
+      const { sub } = verify(accessToken, process.env.JWT_SECRET_KEY as string)
 
       await prisma.token.delete({ where: { jti: sub as string } })
     } catch (error) {
@@ -73,12 +69,12 @@ export class AuthService {
     const now = new Date().getTime()
     const exp = Math.floor(
       new Date(now).setSeconds(
-        parseInt(process.env.JWT_EXPIRATION_TIME || '7200', 10),
+        parseInt(process.env.JWT_EXPIRATION_TIME as string, 10),
       ) / 1000,
     )
     const iat = Math.floor(now / 1000)
 
-    const accessToken = jwt.sign(
+    const accessToken = sign(
       {
         sub,
         iat,
