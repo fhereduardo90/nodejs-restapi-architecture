@@ -12,6 +12,7 @@ import passport from 'passport'
 import { plainToClass } from 'class-transformer'
 import { router } from './router'
 import { HttpErrorDto } from './dtos/http-error.dto'
+import { initEvents } from './events'
 
 export const prisma = new PrismaClient({
   rejectOnNotFound: (error) => new createHttpError.NotFound(error.message),
@@ -67,4 +68,5 @@ app.use(errorHandler)
 app.listen(PORT, async () => {
   // eslint-disable-next-line no-console
   console.log(`Server listening on port %d, env: %s`, PORT, ENVIROMENT)
+  initEvents()
 })

@@ -7,6 +7,7 @@ import {
   findOne,
   update,
   me,
+  confirmAccount,
 } from '../controllers/users.controller'
 
 const router = express.Router()
@@ -21,6 +22,7 @@ export function usersRoutes(): Router {
       asyncHandler(update),
     )
   router.route('/:uuid').get(asyncHandler(findOne))
+  router.route('/confirm-account').post(asyncHandler(confirmAccount))
 
   return router
 }

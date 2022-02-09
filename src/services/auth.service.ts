@@ -64,7 +64,8 @@ export class AuthService {
 
       await prisma.token.delete({ where: { jti: sub as string } })
     } catch (error) {
-      // do nothing
+      // eslint-disable-next-line no-console
+      console.error(error)
     }
   }
 

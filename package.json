@@ -17,6 +17,7 @@
     "class-validator": "^0.13.1",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
+    "eventemitter2": "^6.4.5",
     "express": "^4.17.1",
     "express-async-handler": "^1.1.4",
     "http-errors": "^1.8.0",

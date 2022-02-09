@@ -42,3 +42,12 @@ export async function update(req: Request, res: Response): Promise<void> {
 
   res.status(200).json(result)
 }
+
+export async function confirmAccount(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  await UsersService.confirmAccount(req.query.token as string)
+
+  res.status(204).send()
+}
