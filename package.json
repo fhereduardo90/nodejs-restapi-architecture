@@ -31,10 +31,8 @@
     "express-async-handler": "^1.1.4",
     "http-errors": "^1.8.0",
     "jsonwebtoken": "^8.5.1",
-    "lodash.snakecase": "^4.1.1",
     "passport": "^0.5.0",
     "passport-jwt": "^4.0.0",
-    "pluralize": "^8.0.0",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {

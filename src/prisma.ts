@@ -1,23 +1,25 @@
 import { PrismaClient } from '@prisma/client'
 import { NotFound } from 'http-errors'
-import { plural } from 'pluralize'
-import snakeCase from 'lodash.snakecase'
 
 export const prisma = new PrismaClient({
   rejectOnNotFound: (error) => new NotFound(error.message),
 })
 
-export function clearDatabase(): Promise<void[]> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const models = Reflect.ownKeys(prisma).filter((key: any) => key[0] !== '_')
+export async function clearDatabase(): Promise<void> {
+  const tablenames = await prisma.$queryRaw<
+    Array<{ tablename: string }>
+  >`SELECT tablename FROM pg_tables WHERE schemaname='public'`
 
-  return Promise.all(
-    models.map(async (modelKey) => {
-      if (typeof modelKey === 'string') {
+  for (const { tablename } of tablenames) {
+    if (tablename !== '_prisma_migrations') {
+      try {
         await prisma.$executeRawUnsafe(
-          `TRUNCATE TABLE public.${plural(snakeCase(modelKey))} CASCADE;`,
+          `TRUNCATE TABLE "public"."${tablename}" CASCADE;`,
         )
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error({ error })
       }
-    }),
-  )
+    }
+  }
 }
