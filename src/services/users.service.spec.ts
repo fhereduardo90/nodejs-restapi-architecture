@@ -16,6 +16,7 @@ jest.spyOn(console, 'error').mockImplementation(jest.fn())
 
 describe('UserService', () => {
   let userFactory: UserFactory
+  let users: User[]
 
   beforeAll(() => {
     userFactory = new UserFactory(prisma)
@@ -32,12 +33,13 @@ describe('UserService', () => {
 
   describe('find', () => {
     beforeAll(async () => {
-      await userFactory.makeMany(5)
+      users = await userFactory.makeMany(5)
     })
 
     it('should return all the created users', async () => {
       const result = await UsersService.find()
-      expect(result.length).toBe(5)
+
+      expect(result.length).toBe(users.length)
     })
   })
 
@@ -45,7 +47,6 @@ describe('UserService', () => {
     it('should throw an error if the user already exists', async () => {
       const email = faker.internet.email()
       await userFactory.make({ email })
-
       const data = plainToClass(CreateUserDto, {
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
@@ -60,11 +61,8 @@ describe('UserService', () => {
 
     it('should create a new user', async () => {
       const spyCreateToken = jest.spyOn(AuthService, 'createToken')
-
       const spyEmitter = jest.spyOn(emitter, 'emit')
-
       const generateAccessToken = jest.spyOn(AuthService, 'generateAccessToken')
-
       const data = plainToClass(CreateUserDto, {
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
@@ -75,12 +73,10 @@ describe('UserService', () => {
       const result = await UsersService.create(data)
 
       expect(spyCreateToken).toHaveBeenCalledOnce()
-
       expect(spyEmitter).toHaveBeenCalledOnce()
-
       expect(generateAccessToken).toHaveBeenCalledOnce()
-
-      expect(result).toHaveProperty('accessToken')
+      expect(result).toHaveProperty('accessToken', expect.any(String))
+      expect(result).toHaveProperty('exp', expect.any(Number))
     })
   })
 
@@ -100,7 +96,7 @@ describe('UserService', () => {
     it('should return the user', async () => {
       const result = await UsersService.findOne(user.uuid)
 
-      expect(result).toBeDefined()
+      expect(result).toHaveProperty('uuid', user.uuid)
     })
   })
 
@@ -121,8 +117,10 @@ describe('UserService', () => {
 
     it('should throw an error if the user tries to update the email with an existing one', async () => {
       const existingEmail = faker.internet.email()
-      await userFactory.make({ email: existingEmail })
-      const user = await userFactory.make()
+      const [user] = await Promise.all([
+        userFactory.make(),
+        userFactory.make({ email: existingEmail }),
+      ])
 
       const data = plainToClass(UpdateUserDto, { email: existingEmail })
 
