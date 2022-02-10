@@ -29,15 +29,18 @@ describe('AuthService', () => {
   describe('login', () => {
     let userPassword: string
     let userEmail: string
+
     beforeAll(() => {
       userPassword = faker.internet.password(6)
       userEmail = faker.internet.email()
     })
+
     it('should throw an error if the user does not exist', async () => {
       const data = plainToClass(LoginDto, {
         email: faker.internet.email(),
         password: faker.internet.password(6),
       })
+
       await expect(AuthService.login(data)).rejects.toThrowError(
         new Unauthorized('invalid credentials'),
       )

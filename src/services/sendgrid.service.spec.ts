@@ -1,5 +1,5 @@
 import faker from 'faker'
-import { sendEmail } from './sendgrid.service'
+import { SendgridService } from './sendgrid.service'
 
 jest.mock('@sendgrid/mail', () => {
   return {
@@ -27,7 +27,12 @@ describe('SendgridService', () => {
       const text = faker.lorem.words(5)
       const subject = faker.lorem.word()
 
-      const result = await sendEmail({ to, html: text, text, subject })
+      const result = await SendgridService.sendEmail({
+        to,
+        html: text,
+        text,
+        subject,
+      })
 
       expect(result).toBeUndefined()
       expect(spyConsole).toBeCalledWith([
