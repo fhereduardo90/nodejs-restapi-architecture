@@ -2,10 +2,10 @@ import { Prisma } from '@prisma/client'
 import { UnprocessableEntity, NotFound } from 'http-errors'
 import { hashSync } from 'bcryptjs'
 import { plainToClass } from 'class-transformer'
-import jwt from 'jsonwebtoken'
+import { sign, verify } from 'jsonwebtoken'
 import { CreateUserDto } from '../dtos/users/request/create-user.dto'
 import { UpdateUserDto } from '../dtos/users/request/update-user.dto'
-import { prisma } from '../server'
+import { prisma } from '../prisma'
 import { TokenDto } from '../dtos/auths/response/token.dto'
 import { PrismaErrorEnum } from '../utils/enums'
 import { UserDto } from '../dtos/users/response/user.dto'
@@ -93,14 +93,14 @@ export class UsersService {
     const exp = Math.floor(
       new Date(now).setSeconds(
         parseInt(
-          process.env.JWT_EMAIL_CONFIRMATION_EXPIRATION_TIME || '86400',
+          process.env.JWT_EMAIL_CONFIRMATION_EXPIRATION_TIME as string,
           10,
         ),
       ) / 1000,
     )
     const iat = Math.floor(now / 1000)
 
-    return jwt.sign(
+    return sign(
       {
         sub: userUUID,
         iat,
@@ -114,7 +114,7 @@ export class UsersService {
     let sub
 
     try {
-      ;({ sub } = jwt.verify(
+      ;({ sub } = verify(
         token,
         process.env.JWT_EMAIL_CONFIRMATION_SECRET_KEY as string,
       ))
