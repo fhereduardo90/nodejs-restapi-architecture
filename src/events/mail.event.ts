@@ -1,4 +1,4 @@
-import { sendEmail } from '../services/sendgrid.service'
+import { SendgridService } from '../services/sendgrid.service'
 import { UsersService } from '../services/users.service'
 
 export const USER_EMAIL_CONFIRMATION = Symbol('USER_EMAIL_CONFIRMATION')
@@ -15,7 +15,7 @@ export async function userEmailConfirmationEvent({
   const token = UsersService.generateEmailConfirmationToken(userUUID)
 
   try {
-    await sendEmail({
+    await SendgridService.sendEmail({
       to: email,
       subject: 'Confirm Account',
       text: 'please confirm your email',

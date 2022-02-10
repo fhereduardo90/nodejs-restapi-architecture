@@ -21,7 +21,7 @@ describe('UserService', () => {
     userFactory = new UserFactory(prisma)
   })
 
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.clearAllMocks()
   })
 
@@ -86,6 +86,7 @@ describe('UserService', () => {
 
   describe('findOne', () => {
     let user: User
+
     beforeAll(async () => {
       user = await userFactory.make()
     })
@@ -153,6 +154,7 @@ describe('UserService', () => {
 
   describe('confirmAccount', () => {
     const token = '123.123.123'
+
     it('should throw an error if the token is invalid', async () => {
       await expect(
         UsersService.confirmAccount(faker.lorem.word()),
@@ -173,6 +175,7 @@ describe('UserService', () => {
       const userConfirmed = await userFactory.make({
         confirmedAt: faker.datatype.datetime(),
       })
+
       jest
         .spyOn(jwt, 'verify')
         .mockImplementation(jest.fn(() => ({ sub: userConfirmed.uuid })))
