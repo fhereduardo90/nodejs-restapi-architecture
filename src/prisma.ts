@@ -15,7 +15,7 @@ export function clearDatabase(): Promise<void[]> {
     models.map(async (modelKey) => {
       if (typeof modelKey === 'string') {
         await prisma.$executeRawUnsafe(
-          `TRUNCATE TABLE test.${plural(snakeCase(modelKey))} CASCADE;`,
+          `TRUNCATE TABLE public.${plural(snakeCase(modelKey))} CASCADE;`,
         )
       }
     }),
