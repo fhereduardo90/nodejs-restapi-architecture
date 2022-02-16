@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "dotenv -e .env --  ts-node-dev src/server.ts",
+    "dev": "dotenv -e .env -- ts-node-dev --respawn --transpile-only --exit-child --watch src src/server.ts",
     "test": "dotenv -e .env.test -- jest --runInBand",
     "prisma:migrate:save": "prisma migrate dev --preview-feature --create-only",
     "prisma:migrate:run": "prisma migrate deploy --preview-feature",

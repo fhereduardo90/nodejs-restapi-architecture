@@ -24,6 +24,7 @@ passport.use(
         return done(new Unauthorized('Invalid credentials'), null)
       }
 
+      // this will pass in the user object only with the uuid property to the request object
       return done(null, { uuid: token.user.uuid })
     },
   ),
