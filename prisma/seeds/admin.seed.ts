@@ -5,7 +5,7 @@ export default async (prisma: PrismaClient): Promise<Admin[]> => {
   const password = hashSync('Welcome123!', 10)
   const result = []
   result.push(
-    await prisma.admin.upsert({
+    prisma.admin.upsert({
       create: {
         role: AdminRole.MASTER,
         email: 'eduardomanrique@ravn.co',
@@ -15,7 +15,7 @@ export default async (prisma: PrismaClient): Promise<Admin[]> => {
       update: {},
       where: { email: 'eduardomanrique@ravn.co' },
     }),
-    await prisma.admin.upsert({
+    prisma.admin.upsert({
       create: {
         role: AdminRole.MASTER,
         email: 'fernando@ravn.co',
@@ -26,5 +26,5 @@ export default async (prisma: PrismaClient): Promise<Admin[]> => {
       where: { email: 'fernando@ravn.co' },
     }),
   )
-  return result
+  return Promise.all(result)
 }

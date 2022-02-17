@@ -1,11 +1,13 @@
 import 'reflect-metadata'
+import fs from 'fs'
 import express, { NextFunction, Request, Response } from 'express'
 import cors, { CorsOptions } from 'cors'
 import { HttpError } from 'http-errors'
+import { load } from 'js-yaml'
 import './middlewares/passport'
 import passport from 'passport'
 import { plainToClass } from 'class-transformer'
-import swaggerUI from 'swagger-ui-express'
+import swaggerUI, { JsonObject } from 'swagger-ui-express'
 import { router } from './router'
 import { HttpErrorDto } from './dtos/http-error.dto'
 import { initEvents } from './events'
@@ -57,8 +59,13 @@ app.get('/api/v1/status', (req: Request, res: Response) => {
   res.json({ time: new Date() })
 })
 
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(documentation))
-app.use('/api-docs-v2', swaggerUI.serve, swaggerUI.setup(documentation_v2))
+app.use(
+  '/api-docs',
+  swaggerUI.serve,
+  swaggerUI.setup(
+    load(fs.readFileSync('./docs/docs.yaml', 'utf-8')) as JsonObject,
+  ),
+)
 
 app.use('/', router(app))
 app.use(errorHandler)

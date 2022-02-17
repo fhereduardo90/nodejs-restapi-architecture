@@ -13,8 +13,7 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "strict": true,
-    "strictPropertyInitialization": false,
-    "resolveJsonModule": true
+    "strictPropertyInitialization": false
   },
   "files": ["./global.d.ts"],
   "include": ["prisma/**/*.ts", "src/**/*.ts"]
