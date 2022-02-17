@@ -57,7 +57,7 @@ app.get('/api/v1/status', (req: Request, res: Response) => {
   res.json({ time: new Date() })
 })
 
-app.use('/api-docs', serve, setup(documentation))
+app.use('/api-docs', serve, setup(documentation, { explorer: true }))
 
 app.use('/', router(app))
 app.use(errorHandler)

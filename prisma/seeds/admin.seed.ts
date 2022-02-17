@@ -3,8 +3,8 @@ import { hashSync } from 'bcryptjs'
 
 export default async (prisma: PrismaClient): Promise<Admin[]> => {
   const password = hashSync('Welcome123!', 10)
-  const result = []
-  result.push(
+
+  return Promise.all([
     prisma.admin.upsert({
       create: {
         role: AdminRole.MASTER,
@@ -25,6 +25,5 @@ export default async (prisma: PrismaClient): Promise<Admin[]> => {
       update: {},
       where: { email: 'fernando@ravn.co' },
     }),
-  )
-  return Promise.all(result)
+  ])
 }
