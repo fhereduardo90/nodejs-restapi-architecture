@@ -16,5 +16,5 @@
     "strictPropertyInitialization": false
   },
   "files": ["./global.d.ts"],
-  "include": ["src/**/*.ts"]
+  "include": ["prisma/**/*.ts", "src/**/*.ts"]
 }
