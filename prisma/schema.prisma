@@ -26,14 +26,37 @@ model User {
   @@map("users")
 }
 
+model Admin {
+  id        Int       @id @default(autoincrement())
+  uuid      String    @unique @default(uuid()) @db.Uuid
+  fullName  String    @map("full_name")
+  email     String    @unique
+  password  String
+  role      AdminRole
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  tokens Token[]
+
+  @@map("admins")
+}
+
 model Token {
   id        Int      @id @default(autoincrement())
   uuid      String   @unique @default(uuid())
   createdAt DateTime @default(now()) @map(name: "created_at")
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int      @map(name: "user_id")
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    Int?     @map(name: "user_id")
+  admin     Admin?   @relation(fields: [adminId], references: [id])
+  adminId   Int?     @map(name: "admin_id")
   jti       String   @unique @default(uuid())
   aud       String?
 
   @@map(name: "tokens")
+}
+
+enum AdminRole {
+  MASTER
+  READ
+  WRITE
 }
