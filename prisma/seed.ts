@@ -4,7 +4,7 @@ import { adminSeed } from './seeds'
 const prisma = new PrismaClient()
 
 async function main() {
-  await Promise.all([adminSeed(prisma)])
+  await Promise.all([...(await adminSeed(prisma))])
 }
 
 main()
