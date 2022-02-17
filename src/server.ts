@@ -56,6 +56,7 @@ app.use(cors(corsOptionsDelegate))
 app.get('/api/v1/status', (req: Request, res: Response) => {
   res.json({ time: new Date() })
 })
+
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(documentation))
 app.use('/api-docs-v2', swaggerUI.serve, swaggerUI.setup(documentation_v2))
 
