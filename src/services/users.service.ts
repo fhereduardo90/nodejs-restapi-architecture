@@ -40,7 +40,7 @@ export class UsersService {
         password: hashSync(password, 10),
       },
     })
-    const token = await AuthService.createToken(user.id)
+    const token = await AuthService.createToken(user.id, 'userId')
 
     emitter.emit(USER_EMAIL_CONFIRMATION, {
       email: user.email,

@@ -14,26 +14,38 @@ export class AuthService {
       rejectOnNotFound: false,
     })
 
-    if (!user) {
+    const admin = await prisma.admin.findUnique({
+      where: { email: input.email },
+      rejectOnNotFound: false,
+    })
+
+    const person = user ?? admin
+
+    const type = user ? 'userId' : 'adminId'
+
+    if (!person) {
       throw new Unauthorized('invalid credentials')
     }
 
-    const isValid = compareSync(input.password, user.password)
+    const isValid = compareSync(input.password, person.password)
 
     if (!isValid) {
       throw new Unauthorized('invalid credentials')
     }
 
-    const token = await this.createToken(user.id)
+    const token = await this.createToken(person.id, type)
 
     return this.generateAccessToken(token.jti)
   }
 
-  static async createToken(userId: number): Promise<Token> {
+  static async createToken(
+    id: number,
+    type: 'userId' | 'adminId',
+  ): Promise<Token> {
     try {
       const token = await prisma.token.create({
         data: {
-          userId,
+          [type]: id,
         },
       })
 
