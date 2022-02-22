@@ -1,6 +1,6 @@
-import { Admin, AdminRole } from '@prisma/client'
+import { Admin } from '@prisma/client'
 import { Request, Response, NextFunction } from 'express'
-import { Unauthorized, Forbidden } from 'http-errors'
+import { AuthService } from '../services/auth.service'
 import { Authenticated } from '../utils/types'
 
 export const validateAdmin = (
@@ -8,15 +8,7 @@ export const validateAdmin = (
   res: Response,
   next: NextFunction,
 ): void => {
-  if (!req.user) {
-    throw new Unauthorized('You must need a token')
-  }
-
-  const { user } = req.user as Authenticated
-
-  if (user.type !== 'admin') {
-    throw new Forbidden('The current user does not have the enough privileges')
-  }
+  AuthService.validateAdmin(req.user as Authenticated<Admin>)
 
   next()
 }
@@ -26,11 +18,17 @@ export const validateWriteAdmin = (
   res: Response,
   next: NextFunction,
 ): void => {
-  const { user } = req.user as Authenticated
+  AuthService.validateWriteAdmin(req.user as Authenticated<Admin>)
 
-  if (user.role === AdminRole.READ) {
-    throw new Forbidden('The current admin does not have the enough privileges')
-  }
+  next()
+}
+
+export const validateSuperAdmin = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void => {
+  AuthService.validateSuperAdmin(req.user as Authenticated<Admin>)
 
   next()
 }
