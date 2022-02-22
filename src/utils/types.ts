@@ -1,5 +1,3 @@
-import { Admin, User } from '@prisma/client'
-
 export type EmailType = {
   to: string
   subject: string
@@ -10,6 +8,6 @@ export type EmailType = {
   sendAt?: number
 }
 
-export type Authenticated = {
-  user: (Admin | User) & { type: 'user' | 'admin' }
+export type Authenticated<T> = {
+  user: T & { type: 'user' | 'admin' }
 }
