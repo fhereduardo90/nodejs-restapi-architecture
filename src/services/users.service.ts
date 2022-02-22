@@ -153,4 +153,10 @@ export class UsersService {
       throw new UnprocessableEntity('Invalid Token')
     }
   }
+
+  static async deleteUser(uuid: string): Promise<void> {
+    await prisma.user.findUnique({ where: { uuid }, rejectOnNotFound: true })
+
+    await prisma.user.delete({ where: { uuid } })
+  }
 }
