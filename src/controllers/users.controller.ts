@@ -51,3 +51,10 @@ export async function confirmAccount(
 
   res.status(204).send()
 }
+
+export async function deleteUser(req: Request, res: Response): Promise<void> {
+  const { uuid } = req.params
+  await UsersService.deleteUser(uuid)
+
+  res.status(204).send()
+}
