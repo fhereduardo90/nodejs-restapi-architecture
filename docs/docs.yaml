@@ -403,7 +403,7 @@ paths:
             schema:
               type: 'object'
               properties:
-                fulName:
+                fullName:
                   type: 'string'
                 email:
                   type: 'string'
@@ -440,7 +440,7 @@ paths:
             schema:
               type: 'object'
               properties:
-                fulName:
+                fullName:
                   type: 'string'
                 email:
                   type: 'string'
