@@ -1,19 +1,25 @@
 import { plainToClass } from 'class-transformer'
 import faker from 'faker'
+import 'jest-extended/all'
 import jwt, { JsonWebTokenError } from 'jsonwebtoken'
-import { Unauthorized, NotFound } from 'http-errors'
+import { Unauthorized, NotFound, Forbidden } from 'http-errors'
+import { Admin } from '@prisma/client'
 import { LoginDto } from '../dtos/auths/request/login.dto'
 import { clearDatabase, prisma } from '../prisma'
 import { UserFactory } from '../utils/factories/user.factory'
 import { TokenFactory } from '../utils/factories/token.factory'
+import { Authenticated } from '../utils/types'
+import { AdminFactory } from '../utils/factories/admin.factory'
 import { AuthService } from './auth.service'
 
 describe('AuthService', () => {
   let userFactory: UserFactory
+  let adminFactory: AdminFactory
   let tokenFactory: TokenFactory
 
   beforeAll(() => {
     userFactory = new UserFactory(prisma)
+    adminFactory = new AdminFactory(prisma)
     tokenFactory = new TokenFactory(prisma)
   })
 
@@ -74,13 +80,13 @@ describe('AuthService', () => {
   describe('createToken', () => {
     it('should throw an error if the user does not exist', async () => {
       await expect(
-        AuthService.createToken(faker.datatype.number()),
+        AuthService.createToken(faker.datatype.number(), 'userId'),
       ).rejects.toThrowError(new NotFound('User not found'))
     })
 
     it('should create the token', async () => {
       const user = await userFactory.make()
-      const result = await AuthService.createToken(user.id)
+      const result = await AuthService.createToken(user.id, 'userId')
 
       expect(result).toHaveProperty('userId', user.id)
     })
@@ -124,6 +130,71 @@ describe('AuthService', () => {
       const result = AuthService.generateAccessToken(faker.lorem.word())
 
       expect(result).toHaveProperty('accessToken', '123.123.123')
+    })
+  })
+
+  describe('validateAdmin', () => {
+    let admin: Admin
+    beforeAll(async () => {
+      admin = await adminFactory.make()
+    })
+
+    it('should accept if the user was an admin', () => {
+      const data: Authenticated<Admin> = { user: { ...admin, type: 'admin' } }
+      expect(AuthService.validateAdmin(data)).toBeUndefined()
+    })
+
+    it("should throw an error if the user wasn't an admin", async () => {
+      admin = await adminFactory.make({ role: 'READ' })
+
+      const data: Authenticated<Admin> = { user: { ...admin, type: 'user' } }
+      expect(() => AuthService.validateAdmin(data)).toThrowError(
+        new Forbidden('The current user does not have the enough privileges'),
+      )
+    })
+  })
+
+  describe('validateWriteAdmin', () => {
+    let admin: Admin
+
+    it('should accept if the user was an super admin', async () => {
+      admin = await adminFactory.make({ role: 'MASTER' })
+      const data: Authenticated<Admin> = { user: { ...admin, type: 'admin' } }
+      expect(AuthService.validateWriteAdmin(data)).toBeUndefined()
+    })
+
+    it('should accept if the user was an writer admin', async () => {
+      admin = await adminFactory.make({ role: 'WRITE' })
+      const data: Authenticated<Admin> = { user: { ...admin, type: 'admin' } }
+      expect(AuthService.validateWriteAdmin(data)).toBeUndefined()
+    })
+
+    it("should throw an error if the user wasn't an writer admin", async () => {
+      admin = await adminFactory.make({ role: 'READ' })
+
+      const data: Authenticated<Admin> = { user: { ...admin, type: 'admin' } }
+      expect(() => AuthService.validateWriteAdmin(data)).toThrowError(
+        new Forbidden('The current admin does not have the enough privileges'),
+      )
+    })
+  })
+
+  describe('validateSuperAdmin', () => {
+    let admin: Admin
+
+    it('should accept if the user was an super admin', async () => {
+      admin = await adminFactory.make({ role: 'MASTER' })
+
+      const data: Authenticated<Admin> = { user: { ...admin, type: 'admin' } }
+      expect(AuthService.validateSuperAdmin(data)).toBeUndefined()
+    })
+    it("should throw an error if the user wasn't an super admin", async () => {
+      admin = await adminFactory.make({ role: 'READ' })
+
+      const data: Authenticated<Admin> = { user: { ...admin, type: 'admin' } }
+      expect(() => AuthService.validateSuperAdmin(data)).toThrowError(
+        new Forbidden('The current admin does not have the enough privileges'),
+      )
     })
   })
 })
