@@ -146,13 +146,13 @@ describe('AdminService', () => {
     it('should throw an error if the admin does not exist', async () => {
       await expect(
         AdminService.deleteAdmin(faker.datatype.uuid()),
-      ).rejects.toThrowError(new NotFound('No Admin found'))
+      ).rejects.toThrowError()
     })
 
     it('should delete the admin', async () => {
       const result = await AdminService.deleteAdmin(admin.uuid)
 
-      expect(result).toBeUndefined()
+      expect(result).toHaveProperty('email', admin.email)
     })
   })
 })

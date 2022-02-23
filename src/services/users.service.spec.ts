@@ -197,20 +197,21 @@ describe('UserService', () => {
 
   describe('deleteAdmin', () => {
     let admin: User
+
     beforeAll(async () => {
       admin = await userFactory.make()
     })
 
     it('should throw an error if the user does not exist', async () => {
       await expect(
-        UsersService.deleteUser(faker.datatype.uuid()),
-      ).rejects.toThrowError(new NotFound('No User found'))
+        UsersService.delete(faker.datatype.uuid()),
+      ).rejects.toThrowError()
     })
 
     it('should delete the user', async () => {
-      const result = await UsersService.deleteUser(admin.uuid)
+      const result = await UsersService.delete(admin.uuid)
 
-      expect(result).toBeUndefined()
+      expect(result).toHaveProperty('email', admin.email)
     })
   })
 })

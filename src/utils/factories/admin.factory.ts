@@ -10,6 +10,7 @@ export class AdminFactory extends AbstractFactory<Admin> {
   constructor(protected readonly prismaClient: PrismaClient) {
     super()
   }
+
   async make(input: AdminInput = {}): Promise<Admin> {
     return this.prismaClient.admin.create({
       data: {
@@ -29,6 +30,7 @@ export class AdminFactory extends AbstractFactory<Admin> {
       },
     })
   }
+
   async makeMany(factorial: number, input: AdminInput = {}): Promise<Admin[]> {
     return Promise.all([...Array(factorial)].map(() => this.make(input)))
   }

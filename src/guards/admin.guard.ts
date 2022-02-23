@@ -32,3 +32,13 @@ export const validateSuperAdmin = (
 
   next()
 }
+
+export const validateReadAdmin = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void => {
+  AuthService.validateReadAdmin(req.user as Authenticated<Admin>)
+
+  next()
+}

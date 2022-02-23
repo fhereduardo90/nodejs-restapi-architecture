@@ -75,15 +75,15 @@ paths:
       tags:
         - 'auth'
       responses:
-        '200':
-          description: 'Ok'
+        '204':
+          description: 'No content'
       security:
         - api_key: []
   /users:
     get:
-      deprecated: true
+      summary: 'Only for read admins'
       tags:
-        - 'users'
+        - 'admins'
       responses:
         '200':
           description: 'The users registered'
@@ -96,10 +96,10 @@ paths:
       security:
         - api_key: []
     post:
-      deprecated: true
+      summary: 'Only for admins with write access'
       description: 'Create a new user'
       tags:
-        - 'users'
+        - 'admins'
       requestBody:
         content:
           application/json:
@@ -162,31 +162,6 @@ paths:
                 $ref: '#/components/schemas/User'
       security:
         - api_key: []
-  /users/{uuid}:
-    get:
-      deprecated: true
-      tags:
-        - 'users'
-      parameters:
-        - name: 'uuid'
-          in: 'path'
-          description: 'The uuid for the user'
-          required: true
-          schema:
-            type: 'string'
-      responses:
-        '200':
-          description: 'Ok'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '404':
-          description: 'Not Found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
   /users/confirm-account:
     post:
       tags:
@@ -201,7 +176,7 @@ paths:
           description: 'No Content'
         '422':
           description: 'Unprocessable Entity'
-  /admins/users/{uuid}:
+  /users/{uuid}:
     get:
       tags:
         - 'admins'
@@ -281,45 +256,6 @@ paths:
                 $ref: '#/components/schemas/User'
       security:
         - api_key: []
-  /admins/users:
-    post:
-      summary: 'Only for admins with write access'
-      description: 'Create a new user'
-      tags:
-        - 'admins'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: 'object'
-              properties:
-                firstName:
-                  type: 'string'
-                lastName:
-                  type: 'string'
-                email:
-                  type: 'string'
-                password:
-                  type: 'string'
-      responses:
-        '201':
-          description: 'The new user created'
-      security:
-        - api_key: []
-    get:
-      tags:
-        - 'admins'
-      responses:
-        '200':
-          description: 'The users registered'
-          content:
-            application/json:
-              schema:
-                type: 'array'
-                items:
-                  $ref: '#/components/schemas/User'
-      security:
-        - api_key: []
   /admins:
     post:
       description: 'Create a new Admin'
@@ -368,6 +304,26 @@ paths:
       security:
         - api_key: []
   /admins/{uuid}:
+    get:
+      description: 'Retrieves one admin'
+      tags:
+        - 'admins-master'
+      parameters:
+        - name: 'uuid'
+          in: 'path'
+          description: 'The uuid for the admin'
+          required: true
+          schema:
+            type: 'string'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+      security:
+        - api_key: []
     delete:
       tags:
         - 'admins-master'

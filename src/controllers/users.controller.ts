@@ -33,7 +33,7 @@ export async function me(req: Request, res: Response): Promise<void> {
   res.status(200).json(result)
 }
 
-export async function update(req: Request, res: Response): Promise<void> {
+export async function updateMe(req: Request, res: Response): Promise<void> {
   const { uuid } = req.user as User
   const dto = plainToClass(UpdateUserDto, req.body)
   await dto.isValid()
@@ -54,7 +54,17 @@ export async function confirmAccount(
 
 export async function deleteUser(req: Request, res: Response): Promise<void> {
   const { uuid } = req.params
-  await UsersService.deleteUser(uuid)
+  const result = await UsersService.delete(uuid)
 
-  res.status(204).send()
+  res.status(204).json(result)
+}
+
+export async function update(req: Request, res: Response): Promise<void> {
+  const { uuid } = req.params
+  const dto = plainToClass(UpdateUserDto, req.body)
+  await dto.isValid()
+
+  const result = await UsersService.update(uuid, dto)
+
+  res.status(200).json(result)
 }

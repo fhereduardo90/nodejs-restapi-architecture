@@ -3,24 +3,15 @@ import asyncHandler from 'express-async-handler'
 import passport from 'passport'
 import {
   me,
-  update,
-  updateUser,
+  updateMe,
   create,
   find,
   deleteAdmin,
-  updateAdmin,
-} from '../controllers/admins.controller'
-import {
-  create as createUser,
-  deleteUser,
-  find as findUsers,
+  update,
   findOne,
-} from '../controllers/users.controller'
-import {
-  validateAdmin,
-  validateSuperAdmin,
-  validateWriteAdmin,
-} from '../guards/admin.guard'
+} from '../controllers/admins.controller'
+
+import { validateAdmin, validateSuperAdmin } from '../guards/admin.guard'
 
 const router = express.Router()
 export function adminsRoutes(): Router {
@@ -28,20 +19,7 @@ export function adminsRoutes(): Router {
     .route('/me')
     .all(passport.authenticate('jwt', { session: false }), validateAdmin)
     .get(asyncHandler(me))
-    .patch(asyncHandler(update))
-
-  router
-    .route('/users')
-    .all(passport.authenticate('jwt', { session: false }), validateAdmin)
-    .get(asyncHandler(findUsers))
-    .post(asyncHandler(createUser))
-
-  router
-    .route('/users/:uuid')
-    .all(passport.authenticate('jwt', { session: false }), validateAdmin)
-    .get(asyncHandler(findOne))
-    .patch(validateWriteAdmin, asyncHandler(updateUser))
-    .delete(validateWriteAdmin, asyncHandler(deleteUser))
+    .patch(asyncHandler(updateMe))
 
   router
     .route('')
@@ -52,7 +30,9 @@ export function adminsRoutes(): Router {
   router
     .route('/:uuid')
     .all(passport.authenticate('jwt', { session: false }), validateSuperAdmin)
+    .get(asyncHandler(findOne))
     .delete(asyncHandler(deleteAdmin))
-    .patch(asyncHandler(updateAdmin))
+    .patch(asyncHandler(update))
+
   return router
 }

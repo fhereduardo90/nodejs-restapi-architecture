@@ -154,9 +154,9 @@ export class UsersService {
     }
   }
 
-  static async deleteUser(uuid: string): Promise<void> {
-    await prisma.user.findUnique({ where: { uuid }, rejectOnNotFound: true })
+  static async delete(uuid: string): Promise<UserDto> {
+    const user = await prisma.user.delete({ where: { uuid } })
 
-    await prisma.user.delete({ where: { uuid } })
+    return plainToClass(UserDto, user)
   }
 }

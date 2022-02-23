@@ -7,6 +7,7 @@ export class TokenFactory extends AbstractFactory<Token> {
   constructor(protected readonly prismaClient: PrismaClient) {
     super()
   }
+
   async make(input: TokenInput): Promise<Token> {
     return this.prismaClient.token.create({
       data: {
@@ -14,6 +15,7 @@ export class TokenFactory extends AbstractFactory<Token> {
       },
     })
   }
+
   async makeMany(factorial: number, input: TokenInput): Promise<Token[]> {
     return Promise.all([...Array(factorial)].map(() => this.make(input)))
   }

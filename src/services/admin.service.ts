@@ -82,9 +82,9 @@ export class AdminService {
     return AuthService.generateAccessToken(token.jti)
   }
 
-  static async deleteAdmin(uuid: string): Promise<void> {
-    await prisma.admin.findUnique({ where: { uuid }, rejectOnNotFound: true })
+  static async deleteAdmin(uuid: string): Promise<AdminDto> {
+    const admin = await prisma.admin.delete({ where: { uuid } })
 
-    await prisma.admin.delete({ where: { uuid } })
+    return plainToClass(AdminDto, admin)
   }
 }

@@ -111,7 +111,7 @@ export class AuthService {
   }
 
   static validateWriteAdmin({ user }: Authenticated<Admin>): void {
-    if (user.role === AdminRole.READ) {
+    if (user.role !== AdminRole.MASTER && user.role !== AdminRole.WRITE) {
       throw new Forbidden(
         'The current admin does not have the enough privileges',
       )
@@ -120,6 +120,14 @@ export class AuthService {
 
   static validateSuperAdmin({ user }: Authenticated<Admin>): void {
     if (user.role !== AdminRole.MASTER) {
+      throw new Forbidden(
+        'The current admin does not have the enough privileges',
+      )
+    }
+  }
+
+  static validateReadAdmin({ user }: Authenticated<Admin>): void {
+    if (user.role !== AdminRole.READ && user.role !== AdminRole.MASTER) {
       throw new Forbidden(
         'The current admin does not have the enough privileges',
       )

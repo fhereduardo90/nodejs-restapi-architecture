@@ -95,6 +95,7 @@ describe('AuthService', () => {
   describe('logout', () => {
     it('should return if the token was not provided', async () => {
       const result = await AuthService.logout()
+
       expect(result).toBeUndefined()
     })
 
@@ -141,13 +142,14 @@ describe('AuthService', () => {
 
     it('should accept if the user was an admin', () => {
       const data: Authenticated<Admin> = { user: { ...admin, type: 'admin' } }
+
       expect(AuthService.validateAdmin(data)).toBeUndefined()
     })
 
     it("should throw an error if the user wasn't an admin", async () => {
       admin = await adminFactory.make({ role: 'READ' })
-
       const data: Authenticated<Admin> = { user: { ...admin, type: 'user' } }
+
       expect(() => AuthService.validateAdmin(data)).toThrowError(
         new Forbidden('The current user does not have the enough privileges'),
       )
@@ -160,19 +162,21 @@ describe('AuthService', () => {
     it('should accept if the user was an super admin', async () => {
       admin = await adminFactory.make({ role: 'MASTER' })
       const data: Authenticated<Admin> = { user: { ...admin, type: 'admin' } }
+
       expect(AuthService.validateWriteAdmin(data)).toBeUndefined()
     })
 
     it('should accept if the user was an writer admin', async () => {
       admin = await adminFactory.make({ role: 'WRITE' })
       const data: Authenticated<Admin> = { user: { ...admin, type: 'admin' } }
+
       expect(AuthService.validateWriteAdmin(data)).toBeUndefined()
     })
 
     it("should throw an error if the user wasn't an writer admin", async () => {
       admin = await adminFactory.make({ role: 'READ' })
-
       const data: Authenticated<Admin> = { user: { ...admin, type: 'admin' } }
+
       expect(() => AuthService.validateWriteAdmin(data)).toThrowError(
         new Forbidden('The current admin does not have the enough privileges'),
       )
@@ -184,15 +188,36 @@ describe('AuthService', () => {
 
     it('should accept if the user was an super admin', async () => {
       admin = await adminFactory.make({ role: 'MASTER' })
-
       const data: Authenticated<Admin> = { user: { ...admin, type: 'admin' } }
+
       expect(AuthService.validateSuperAdmin(data)).toBeUndefined()
     })
+
     it("should throw an error if the user wasn't an super admin", async () => {
       admin = await adminFactory.make({ role: 'READ' })
-
       const data: Authenticated<Admin> = { user: { ...admin, type: 'admin' } }
+
       expect(() => AuthService.validateSuperAdmin(data)).toThrowError(
+        new Forbidden('The current admin does not have the enough privileges'),
+      )
+    })
+  })
+
+  describe('validateReadAdmin', () => {
+    let admin: Admin
+
+    it('should accept if the user was an read admin', async () => {
+      admin = await adminFactory.make({ role: 'READ' })
+      const data: Authenticated<Admin> = { user: { ...admin, type: 'admin' } }
+
+      expect(AuthService.validateReadAdmin(data)).toBeUndefined()
+    })
+
+    it("should throw an error if the user wasn't an read admin", async () => {
+      admin = await adminFactory.make({ role: 'WRITE' })
+      const data: Authenticated<Admin> = { user: { ...admin, type: 'admin' } }
+
+      expect(() => AuthService.validateReadAdmin(data)).toThrowError(
         new Forbidden('The current admin does not have the enough privileges'),
       )
     })
