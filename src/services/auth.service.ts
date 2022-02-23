@@ -1,4 +1,4 @@
-import { Admin, Prisma, Token } from '@prisma/client'
+import { Admin, Prisma, Token, User } from '@prisma/client'
 import { compareSync } from 'bcryptjs'
 import { Unauthorized, NotFound, Forbidden } from 'http-errors'
 import { verify, sign } from 'jsonwebtoken'
@@ -99,6 +99,13 @@ export class AuthService {
     return {
       accessToken,
       exp,
+    }
+  }
+  static validateUser({ user }: Authenticated<User>): void {
+    if (user.type !== 'user') {
+      throw new Forbidden(
+        'The current user does not have the enough privileges',
+      )
     }
   }
 

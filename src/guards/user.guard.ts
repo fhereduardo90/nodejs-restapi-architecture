@@ -1,6 +1,7 @@
-import { Admin, User } from '@prisma/client'
+import { User } from '@prisma/client'
 import { Request, Response, NextFunction } from 'express'
-import { Unauthorized, Forbidden } from 'http-errors'
+import { Unauthorized } from 'http-errors'
+import { AuthService } from '../services/auth.service'
 import { Authenticated } from '../utils/types'
 
 export const validateUser = (
@@ -12,11 +13,7 @@ export const validateUser = (
     throw new Unauthorized('You must need a token')
   }
 
-  const { user } = req.user as Authenticated<Admin | User>
-
-  if (user.type !== 'user') {
-    throw new Forbidden('The current user does not have the enough privileges')
-  }
+  AuthService.validateUser(req.user as Authenticated<User>)
 
   next()
 }

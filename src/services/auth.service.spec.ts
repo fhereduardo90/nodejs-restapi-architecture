@@ -3,7 +3,7 @@ import faker from 'faker'
 import 'jest-extended/all'
 import jwt, { JsonWebTokenError } from 'jsonwebtoken'
 import { Unauthorized, NotFound, Forbidden } from 'http-errors'
-import { Admin } from '@prisma/client'
+import { Admin, User } from '@prisma/client'
 import { LoginDto } from '../dtos/auths/request/login.dto'
 import { clearDatabase, prisma } from '../prisma'
 import { UserFactory } from '../utils/factories/user.factory'
@@ -134,8 +134,33 @@ describe('AuthService', () => {
     })
   })
 
+  describe('validateUser', () => {
+    let user: User
+
+    beforeAll(async () => {
+      user = await userFactory.make()
+    })
+
+    it('should accept if the user was an user', () => {
+      const data: Authenticated<User> = { user: { ...user, type: 'user' } }
+
+      expect(AuthService.validateUser(data)).toBeUndefined()
+    })
+
+    it("should throw an error if the user wasn't exists", async () => {
+      const data: Authenticated<User> = {
+        user: { ...user, type: 'admin' },
+      }
+
+      expect(() => AuthService.validateUser(data)).toThrowError(
+        new Forbidden('The current user does not have the enough privileges'),
+      )
+    })
+  })
+
   describe('validateAdmin', () => {
     let admin: Admin
+
     beforeAll(async () => {
       admin = await adminFactory.make()
     })

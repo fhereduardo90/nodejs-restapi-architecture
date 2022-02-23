@@ -4,6 +4,7 @@ import { User } from '@prisma/client'
 import { CreateUserDto } from '../dtos/users/request/create-user.dto'
 import { UpdateUserDto } from '../dtos/users/request/update-user.dto'
 import { UsersService } from '../services/users.service'
+import { Authenticated } from '../utils/types'
 
 export async function find(req: Request, res: Response): Promise<void> {
   const result = await UsersService.find()
@@ -27,14 +28,17 @@ export async function findOne(req: Request, res: Response): Promise<void> {
 }
 
 export async function me(req: Request, res: Response): Promise<void> {
-  const user = req.user as User
+  const { user } = req.user as Authenticated<User>
+
   const result = await UsersService.findOne(user.uuid)
 
   res.status(200).json(result)
 }
 
 export async function updateMe(req: Request, res: Response): Promise<void> {
-  const { uuid } = req.user as User
+  const {
+    user: { uuid },
+  } = req.user as Authenticated<User>
   const dto = plainToClass(UpdateUserDto, req.body)
   await dto.isValid()
 

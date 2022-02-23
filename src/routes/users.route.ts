@@ -19,16 +19,15 @@ import {
   validateReadAdmin,
   validateWriteAdmin,
 } from '../guards/admin.guard'
+import { validateUser } from '../guards/user.guard'
 const router = express.Router()
 
 export function usersRoutes(): Router {
   router
     .route('/me')
-    .get(passport.authenticate('jwt', { session: false }), asyncHandler(me))
-    .patch(
-      passport.authenticate('jwt', { session: false }),
-      asyncHandler(updateMe),
-    )
+    .all(passport.authenticate('jwt', { session: false }), validateUser)
+    .get(asyncHandler(me))
+    .patch(asyncHandler(updateMe))
 
   router.route('/confirm-account').post(asyncHandler(confirmAccount))
 
