@@ -13,6 +13,7 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "strict": true,
+    "skipLibCheck": true,
     "strictPropertyInitialization": false
   },
   "files": ["./global.d.ts"],
