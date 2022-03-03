@@ -7,3 +7,7 @@ export type EmailType = {
   dynamicTemplateData?: Record<string, unknown>
   sendAt?: number
 }
+
+export type Authenticated<T> = {
+  user: T & { type: 'user' | 'admin' }
+}

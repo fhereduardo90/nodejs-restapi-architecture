@@ -40,7 +40,7 @@ export class UsersService {
         password: hashSync(password, 10),
       },
     })
-    const token = await AuthService.createToken(user.id)
+    const token = await AuthService.createToken(user.id, 'userId')
 
     emitter.emit(USER_EMAIL_CONFIRMATION, {
       email: user.email,
@@ -152,5 +152,11 @@ export class UsersService {
 
       throw new UnprocessableEntity('Invalid Token')
     }
+  }
+
+  static async delete(uuid: string): Promise<UserDto> {
+    const user = await prisma.user.delete({ where: { uuid } })
+
+    return plainToClass(UserDto, user)
   }
 }

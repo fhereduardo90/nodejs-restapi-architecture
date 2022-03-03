@@ -15,7 +15,8 @@ passport.use(
           jti: jwtPayload.sub,
         },
         select: {
-          user: { select: { uuid: true } },
+          user: { select: { uuid: true, email: true } },
+          admin: { select: { uuid: true, email: true, role: true } },
         },
         rejectOnNotFound: false,
       })
@@ -24,8 +25,14 @@ passport.use(
         return done(new Unauthorized('Invalid credentials'), null)
       }
 
+      const user = token.user
+        ? { ...token.user, type: 'user' }
+        : { ...token.admin, type: 'admin' }
+
       // this will pass in the user object only with the uuid property to the request object
-      return done(null, { uuid: token.user.uuid })
+      return done(null, {
+        user,
+      })
     },
   ),
 )

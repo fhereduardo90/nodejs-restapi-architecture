@@ -1,11 +1,12 @@
-import { Prisma, Token } from '@prisma/client'
+import { Admin, Prisma, Token, User } from '@prisma/client'
 import { compareSync } from 'bcryptjs'
-import { Unauthorized, NotFound } from 'http-errors'
+import { Unauthorized, NotFound, Forbidden } from 'http-errors'
 import { verify, sign } from 'jsonwebtoken'
 import { LoginDto } from '../dtos/auths/request/login.dto'
 import { TokenDto } from '../dtos/auths/response/token.dto'
 import { prisma } from '../prisma'
-import { PrismaErrorEnum } from '../utils/enums'
+import { AdminRole, PrismaErrorEnum } from '../utils/enums'
+import { Authenticated } from '../utils/types'
 
 export class AuthService {
   static async login(input: LoginDto): Promise<TokenDto> {
@@ -14,26 +15,38 @@ export class AuthService {
       rejectOnNotFound: false,
     })
 
-    if (!user) {
+    const admin = await prisma.admin.findUnique({
+      where: { email: input.email },
+      rejectOnNotFound: false,
+    })
+
+    const person = user ?? admin
+
+    const type = user ? 'userId' : 'adminId'
+
+    if (!person) {
       throw new Unauthorized('invalid credentials')
     }
 
-    const isValid = compareSync(input.password, user.password)
+    const isValid = compareSync(input.password, person.password)
 
     if (!isValid) {
       throw new Unauthorized('invalid credentials')
     }
 
-    const token = await this.createToken(user.id)
+    const token = await this.createToken(person.id, type)
 
     return this.generateAccessToken(token.jti)
   }
 
-  static async createToken(userId: number): Promise<Token> {
+  static async createToken(
+    id: number,
+    type: 'userId' | 'adminId',
+  ): Promise<Token> {
     try {
       const token = await prisma.token.create({
         data: {
-          userId,
+          [type]: id,
         },
       })
 
@@ -86,6 +99,45 @@ export class AuthService {
     return {
       accessToken,
       exp,
+    }
+  }
+  static validateUser({ user }: Authenticated<User>): void {
+    if (user.type !== 'user') {
+      throw new Forbidden(
+        'The current user does not have the enough privileges',
+      )
+    }
+  }
+
+  static validateAdmin({ user }: Authenticated<Admin>): void {
+    if (user.type !== 'admin') {
+      throw new Forbidden(
+        'The current user does not have the enough privileges',
+      )
+    }
+  }
+
+  static validateWriteAdmin({ user }: Authenticated<Admin>): void {
+    if (user.role !== AdminRole.MASTER && user.role !== AdminRole.WRITE) {
+      throw new Forbidden(
+        'The current admin does not have the enough privileges',
+      )
+    }
+  }
+
+  static validateSuperAdmin({ user }: Authenticated<Admin>): void {
+    if (user.role !== AdminRole.MASTER) {
+      throw new Forbidden(
+        'The current admin does not have the enough privileges',
+      )
+    }
+  }
+
+  static validateReadAdmin({ user }: Authenticated<Admin>): void {
+    if (user.role !== AdminRole.READ && user.role !== AdminRole.MASTER) {
+      throw new Forbidden(
+        'The current admin does not have the enough privileges',
+      )
     }
   }
 }
