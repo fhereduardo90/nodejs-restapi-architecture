@@ -51,6 +51,7 @@ model Token {
   adminId   Int?     @map(name: "admin_id")
   jti       String   @unique @default(uuid())
   aud       String?
+  expiresAt DateTime @map(name: "expires_at")
 
   @@map(name: "tokens")
 }
