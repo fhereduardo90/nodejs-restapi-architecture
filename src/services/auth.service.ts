@@ -31,9 +31,16 @@ export class AuthService {
 
   static async createToken(userId: number): Promise<Token> {
     try {
+      const expiresAt = new Date()
+      expiresAt.setSeconds(
+        expiresAt.getSeconds() +
+          parseInt(process.env.JWT_EXPIRATION_TIME as string, 10),
+      )
+
       const token = await prisma.token.create({
         data: {
           userId,
+          expiresAt,
         },
       })
 
