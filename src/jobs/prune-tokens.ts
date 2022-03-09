@@ -16,4 +16,4 @@ import { TokenService } from '../services/token.service'
 second ( optional )
 */
 
-schedule('*/5 * * * *', TokenService.prune)
+schedule('*/2 * * * *', TokenService.prune)
