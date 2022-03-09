@@ -11,6 +11,7 @@ import { HttpErrorDto } from './dtos/http-error.dto'
 import { initEvents } from './events'
 import { documentation } from './swagger'
 import './jobs/prune-tokens'
+import './jobs/send-wecome-email'
 
 const app = express()
 const PORT = process.env.PORT || 3000

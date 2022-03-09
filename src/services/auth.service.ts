@@ -6,6 +6,7 @@ import { LoginDto } from '../dtos/auths/request/login.dto'
 import { TokenDto } from '../dtos/auths/response/token.dto'
 import { prisma } from '../prisma'
 import { PrismaErrorEnum } from '../utils/enums'
+import { agenda } from '../agenda'
 
 export class AuthService {
   static async login(input: LoginDto): Promise<TokenDto> {
@@ -25,6 +26,10 @@ export class AuthService {
     }
 
     const token = await this.createToken(user.id)
+
+    await agenda.schedule('in 30 seconds', 'send-welcome-email', {
+      email: user.email,
+    })
 
     return this.generateAccessToken(token.jti)
   }
