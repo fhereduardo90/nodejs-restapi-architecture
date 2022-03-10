@@ -1,4 +1,4 @@
-import { JobAttributesData, JobPriority } from 'agenda'
+import { JobAttributesData } from 'agenda'
 import { agenda } from '../agenda'
 
 agenda.define(

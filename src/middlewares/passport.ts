@@ -1,6 +1,6 @@
-import { Unauthorized } from 'http-errors'
 import passport from 'passport'
 import { ExtractJwt, Strategy } from 'passport-jwt'
+import { Unauthorized } from 'http-errors'
 import { prisma } from '../prisma'
 
 passport.use(
@@ -20,7 +20,7 @@ passport.use(
         rejectOnNotFound: false,
       })
 
-      if (!token) {
+      if (!token || !token?.user) {
         return done(new Unauthorized('Invalid credentials'), null)
       }
 
